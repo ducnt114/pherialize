@@ -118,6 +118,10 @@ public class Unserializer {
                 result = unserializeReference();
                 break;
 
+            case 'O':
+                result = unserializePhpObject();
+                break;
+                
             default:
                 throw new UnserializeException(
                         "Unable to unserialize unknown type " + type);
@@ -126,7 +130,7 @@ public class Unserializer {
         this.history.add(result);
         return result;
     }
-
+    
     /**
      * Unserializes the next object in the data stream into a String.
      *
@@ -246,6 +250,14 @@ public class Unserializer {
         }
         this.pos++;
         return result;
+    }
+    
+    public Mixed unserializePhpObject() {
+        int position = this.data.indexOf(':', this.pos + 2);
+        int startPosition = this.data.indexOf(':', position + 1);
+        this.pos = startPosition - 1;
+        
+        return unserializeArray();
     }
 
     static String decode(String encoded, Charset charset) {
